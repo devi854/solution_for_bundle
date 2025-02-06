@@ -1,0 +1,44 @@
+name: deploy workflows
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+env:
+  DATABRICKS_HOST: ${{secrets.DATABRICKS_HOST}}
+  DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_DEV_TOKEN }}
+  DATABRICKS_BUNDLE_ENV: dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Export Databricks Host URL
+        run: |
+          echo "DATABRICKS_HOST_URL=${{ secrets.DATABRICKS_HOST_URL }}" >> $GITHUB_ENV
+
+      - name: Replace Placeholder in bundle.yml
+        run: |
+          sed -i "s|\${DATABRICKS_HOST_URL}|${DATABRICKS_HOST_URL}|g" databricks.yml
+
+      # Download the Databricks CLI.
+      # See https://github.com/databricks/setup-cli
+      - uses: databricks/setup-cli@main
+
+      - name: Validate Databricks Bundle
+        run: |
+          databricks bundle validate
+
+      # Deploy the bundle to the target as defined
+      # in the bundle's settings file.
+      - run: databricks bundle deploy
+      
+      #Deploy Resources to DBFS
+      #- run: databricks fs cp --overwrite --recursive extra_resources/ dbfs:/FileStore/extra_resources/
