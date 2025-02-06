@@ -30,8 +30,8 @@ jobs:
     - name: Create feature branch
       id: create-branch
       run: |
-        git config user.name github-actions
-        git config user.email github-actions@github.com
+        git config --global user.name devi854
+        git config --global user.email github-actions@github.com
         BRANCH_NAME="workflows-update-$(date +%s)"
         git checkout -b "$BRANCH_NAME"
         echo "branch_name=$BRANCH_NAME" >> $GITHUB_ENV
