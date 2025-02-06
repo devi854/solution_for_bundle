@@ -42,7 +42,10 @@ jobs:
         git commit -m "Updated Databricks workflows"
 
     - name: Push changes
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
+        git remote set-url origin https://x-access-token:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git
         git push origin ${{ env.branch_name }}
 
     - name: Create Pull Request
