@@ -21,32 +21,36 @@ jobs:
     - name: Export Databricks Workflows
       run: |
         mkdir -p workflows
-        databricks workflows export --output-dir workflows
+        for job_id in $(databricks jobs list --output JSON | jq -r '.[].job_id'); do
+          job_name=$(databricks jobs get --job-id "$job_id" | jq -r '.settings.name' | tr ' ' '_' | tr -d '[:punct:]')
+          echo "Exporting job: $job_name ($job_id)"
+          databricks jobs get --job-id "$job_id" > "workflows/${job_name}.json"
+        done
 
     - name: Create feature branch
       id: create-branch
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        branch_name="workflows-update-$(date +%s)"
-        git checkout -b $branch_name
-        echo "::set-output name=branch_name::$branch_name"
+        BRANCH_NAME="workflows-update-$(date +%s)"
+        git checkout -b "$BRANCH_NAME"
+        echo "branch_name=$BRANCH_NAME" >> $GITHUB_ENV
 
     - name: Commit changes
       run: |
         git add workflows
-        git commit -m "Update Databricks workflows"
+        git commit -m "Updated Databricks workflows"
 
     - name: Push changes
       run: |
-        git push origin ${{ steps.create-branch.outputs.branch_name }}
+        git push origin ${{ env.branch_name }}
 
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ steps.create-branch.outputs.branch_name }}
+        branch: ${{ env.branch_name }}
         base: main
         title: "Update Databricks Workflows"
-        body: "Automated PR to update Databricks workflows"
+        body: "Automated PR to update Databricks workflows."
         labels: "workflows-update"
