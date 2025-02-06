@@ -30,8 +30,8 @@ jobs:
     - name: Create feature branch
       id: create-branch
       run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config user.name github-actions
+        git config user.email github-actions@github.com
         BRANCH_NAME="workflows-update-$(date +%s)"
         git checkout -b "$BRANCH_NAME"
         echo "branch_name=$BRANCH_NAME" >> $GITHUB_ENV
@@ -45,7 +45,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
-        git remote set-url origin https://x-access-token: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@github.com/${{ github.repository }}
+        git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
         git push origin ${{ env.branch_name }}
 
     - name: Create Pull Request
