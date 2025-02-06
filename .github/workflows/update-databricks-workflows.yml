@@ -3,6 +3,10 @@ name: Update Databricks Workflows
 on:
   workflow_dispatch:
 
+env:
+  DATABRICKS_HOST: ${{secrets.DATABRICKS_HOST}}
+  DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_DEV_TOKEN }}
+
 jobs:
   update-workflows:
     runs-on: ubuntu-latest
@@ -10,18 +14,9 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-
-    - name: Install dependencies
-      run: |
-        sudo apt-get update && sudo apt-get install -y jq
-        pip install databricks-cli
-
-    - name: Configure Databricks CLI
-      env:
-        DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-        DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-      run: |
-        databricks configure --host "$DATABRICKS_HOST" --token "$DATABRICKS_TOKEN"
+  
+    - name: Databricks CLI
+      uses: databricks/setup-cli@main
 
     - name: Export Databricks Workflows
       run: |
