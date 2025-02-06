@@ -22,9 +22,9 @@ jobs:
       run: |
         mkdir -p workflows
         for job_id in $(databricks jobs list --output JSON | jq -r '.[].job_id'); do
-          job_name=$(databricks jobs get --job-id "$job_id" | jq -r '.settings.name' | tr ' ' '_' | tr -d '[:punct:]')
+          job_name=$(databricks jobs get "$job_id" | jq -r '.settings.name' | tr ' ' '_' | tr -d '[:punct:]')
           echo "Exporting job: $job_name ($job_id)"
-          databricks jobs get --job-id "$job_id" > "workflows/${job_name}.json"
+          databricks jobs get "$job_id" > "workflows/${job_name}.json"
         done
 
     - name: Create feature branch
