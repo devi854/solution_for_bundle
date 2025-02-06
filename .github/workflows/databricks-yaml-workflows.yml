@@ -1,0 +1,59 @@
+name: YAML workflows
+
+on:
+  workflow_dispatch:
+
+env:
+  DATABRICKS_HOST: ${{secrets.DATABRICKS_HOST}}
+  DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_DEV_TOKEN }}
+
+jobs:
+  update-workflows:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+  
+    - name: Databricks CLI
+      uses: databricks/setup-cli@main
+
+    - name: Export Databricks Workflows as YAML
+      run: |
+        mkdir -p workflows
+        for job_id in $(databricks jobs list --output JSON | jq -r '.jobs[].job_id'); do
+          job_name=$(databricks jobs get $job_id --output JSON | jq -r '.settings.name' | tr ' ' '_')
+          echo "Exporting workflow: $job_name (ID: $job_id)"
+          databricks jobs get $job_id --output YAML > workflows/"$job_name".yaml
+        done
+
+    - name: Create feature branch
+      id: create-branch
+      run: |
+        git config --global user.name github-actions
+        git config --global user.email github-actions@github.com
+        branch_name="workflows-update-$(date +%s)"
+        git checkout -b $branch_name
+        echo "branch_name=$branch_name" >> $GITHUB_ENV
+
+    - name: Commit changes
+      run: |
+        git add workflows
+        git commit -m "Update Databricks workflows (YAML format)"
+
+    - name: Push changes
+      env:
+        GH_PAT: ${{ secrets.GH_PAT }}
+      run: |
+        git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository }}
+        git push origin ${{ env.branch_name }}
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v4
+      with:
+        token: ${{ secrets.GH_PAT }}
+        branch: ${{ env.branch_name }}
+        base: main
+        title: "Update Databricks Workflows"
+        body: "Automated PR to update Databricks workflows (YAML format)"
+        labels: "workflows-update"
