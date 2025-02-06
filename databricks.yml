@@ -7,5 +7,5 @@ include:
 targets:
   dev:
     workspace:
-      host: ${DATABRICKS_HOST_URL}
+      host: https://adb-1999993416645314.14.azuredatabricks.net
       root_path: /Code/${bundle.name}
