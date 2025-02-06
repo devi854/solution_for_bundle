@@ -1,0 +1,52 @@
+name: Update Databricks Workflows
+
+on:
+  workflow_dispatch:
+
+env:
+  DATABRICKS_HOST: ${{secrets.DATABRICKS_HOST}}
+  DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_DEV_TOKEN }}
+
+jobs:
+  update-workflows:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+  
+    - name: Databricks CLI
+      uses: databricks/setup-cli@main
+
+    - name: Export Databricks Workflows
+      run: |
+        mkdir -p workflows
+        databricks workflows export --output-dir workflows
+
+    - name: Create feature branch
+      id: create-branch
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        branch_name="workflows-update-$(date +%s)"
+        git checkout -b $branch_name
+        echo "::set-output name=branch_name::$branch_name"
+
+    - name: Commit changes
+      run: |
+        git add workflows
+        git commit -m "Update Databricks workflows"
+
+    - name: Push changes
+      run: |
+        git push origin ${{ steps.create-branch.outputs.branch_name }}
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ steps.create-branch.outputs.branch_name }}
+        base: main
+        title: "Update Databricks Workflows"
+        body: "Automated PR to update Databricks workflows"
+        labels: "workflows-update"
