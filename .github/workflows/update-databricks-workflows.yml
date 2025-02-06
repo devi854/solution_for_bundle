@@ -30,30 +30,9 @@ jobs:
     - name: Create feature branch
       id: create-branch
       run: |
-        git config --global user.name devi854
+        git config --global user.name github-actions
         git config --global user.email github-actions@github.com
-        BRANCH_NAME="workflows-update-$(date +%s)"
-        git checkout -b "$BRANCH_NAME"
-        echo "branch_name=$BRANCH_NAME" >> $GITHUB_ENV
-
-    - name: Commit changes
-      run: |
+        git pull
         git add workflows
-        git commit -m "Updated Databricks workflows"
-
-    - name: Push changes
-      env:
-        GH_PAT: ${{ secrets.GH_PAT }}
-      run: |
-        git push origin ${{ env.branch_name }}
-
-
-    - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v4
-      with:
-        token: ${{ secrets.GH_PAT }}
-        branch: ${{ env.branch_name }}
-        base: main
-        title: "Update Databricks Workflows"
-        body: "Automated PR to update Databricks workflows."
-        labels: "workflows-update"
+        git commit --allow-empty -m "Updated Databricks workflows"
+        git push
