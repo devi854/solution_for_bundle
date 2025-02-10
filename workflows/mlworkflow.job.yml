@@ -1,0 +1,32 @@
+resources:
+  jobs:
+    mlworkflow:
+      name: MLworkflow
+      job_clusters:
+        - job_cluster_key: Job_cluster
+          new_cluster:
+            spark_version: 15.4.x-scala2.12
+            data_security_mode: LEGACY_SINGLE_USER_STANDARD
+            node_type_id: Standard_D4ds_v5
+            azure_attributes:
+              spot_bid_max_price: -1
+              availability: ON_DEMAND_AZURE
+              first_on_demand: 1
+            runtime_engine: PHOTON
+            spark_env_vars:
+              PYSPARK_PYTHON: /databricks/python3/bin/python3
+            num_workers: 8
+            enable_elastic_disk: true
+      tasks:
+        - task_key: workflow_2
+          job_cluster_key: Job_cluster
+          notebook_task:
+            notebook_path: ../src/MLModel.py
+            source: WORKSPACE
+          run_if: ALL_SUCCESS
+          email_notifications: {}
+      max_concurrent_runs: 1
+      email_notifications: {}
+      webhook_notifications: {}
+      queue:
+        enabled: true
