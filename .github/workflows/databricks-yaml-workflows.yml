@@ -22,10 +22,11 @@ jobs:
       run: |
         mkdir -p workflows
         for job_id in $(databricks jobs list --output JSON | jq -r '.[].job_id'); do
-          job_name=$(databricks jobs get "$job_id" | jq -r '.settings.name' | tr ' ' '_' | tr -d '[:punct:]')
-          echo "Exporting job: $job_name ($job_id)"
-          databricks jobs get "$job_id" | yq -o=yaml > "workflows/${job_name}.yaml"
+          echo "Generating job: $job_id"
+          databricks bundle generate job --existing-job-id "$job_id"
+          mv resources/jobs/*.yaml workflows/ 2>/dev/null || echo "No files to move"
         done
+        rm -rf resources src
 
     - name: Create feature branch
       id: create-branch
