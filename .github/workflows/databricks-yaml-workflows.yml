@@ -25,9 +25,7 @@ jobs:
           echo "Generating job: $job_id"
           databricks bundle generate job --existing-job-id "$job_id"
         done
-        if [ -d "resources/jobs" ]; then
-          mv resources/jobs/* workflows/
-        fi
+        mv resources/*.yml workflows/ 2>/dev/null || true
         rm -rf resources src
 
     - name: Create feature branch
