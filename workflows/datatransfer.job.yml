@@ -1,0 +1,32 @@
+resources:
+  jobs:
+    datatransfer:
+      name: datatransfer
+      job_clusters:
+        - job_cluster_key: Job_cluster
+          new_cluster:
+            enable_elastic_disk: true
+            spark_env_vars:
+              PYSPARK_PYTHON: /databricks/python3/bin/python3
+            runtime_engine: PHOTON
+            node_type_id: Standard_D4ds_v5
+            data_security_mode: LEGACY_SINGLE_USER_STANDARD
+            num_workers: 8
+            azure_attributes:
+              spot_bid_max_price: -1
+              availability: ON_DEMAND_AZURE
+              first_on_demand: 1
+            spark_version: 15.4.x-scala2.12
+      tasks:
+        - task_key: transformation
+          job_cluster_key: Job_cluster
+          email_notifications: {}
+          notebook_task:
+            notebook_path: ../src/datatransformation.py
+            source: WORKSPACE
+          run_if: ALL_SUCCESS
+      email_notifications: {}
+      max_concurrent_runs: 1
+      webhook_notifications: {}
+      queue:
+        enabled: true

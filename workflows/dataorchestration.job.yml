@@ -1,0 +1,32 @@
+resources:
+  jobs:
+    dataorchestration:
+      name: dataorchestration
+      job_clusters:
+        - job_cluster_key: Job_cluster
+          new_cluster:
+            spark_env_vars:
+              PYSPARK_PYTHON: /databricks/python3/bin/python3
+            data_security_mode: LEGACY_SINGLE_USER_STANDARD
+            spark_version: 15.4.x-scala2.12
+            node_type_id: Standard_D4ds_v5
+            enable_elastic_disk: true
+            num_workers: 8
+            azure_attributes:
+              availability: ON_DEMAND_AZURE
+              first_on_demand: 1
+              spot_bid_max_price: -1
+            runtime_engine: PHOTON
+      tasks:
+        - task_key: job_orchestartion
+          job_cluster_key: Job_cluster
+          notebook_task:
+            notebook_path: ../src/joborchestration.py
+            source: WORKSPACE
+          email_notifications: {}
+          run_if: ALL_SUCCESS
+      max_concurrent_runs: 1
+      queue:
+        enabled: true
+      webhook_notifications: {}
+      email_notifications: {}
