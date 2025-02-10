@@ -21,8 +21,13 @@ jobs:
     - name: Export Databricks Workflows
       run: |
         mkdir -p workflows
-        databricks bundle generate job --existing-job-id 333681960801059 989837549311403 205322105069298 382932430508596
-        mv resources/* workflows/ 2>/dev/null || true
+        for job_id in 333681960801059 989837549311403 205322105069298 382932430508596; do
+          echo "Generating job: $job_id"
+          databricks bundle generate job --existing-job-id "$job_id"
+        done
+        if [ -d "resources/jobs" ]; then
+          mv resources/jobs/* workflows/
+        fi
         rm -rf resources src
 
     - name: Create feature branch
