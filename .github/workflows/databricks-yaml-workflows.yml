@@ -28,12 +28,26 @@ jobs:
         mv resources/*.yml workflows/ 2>/dev/null || true
         rm -rf resources src
 
-    - name: Create feature branch
-      id: create-branch
+    - name: Create Feature Branch and Raise PR
       run: |
-        git config --global user.name github-actions
-        git config --global user.email github-actions@github.com
-        git pull
-        git add workflows
-        git commit --allow-empty -m "Updated Databricks workflows"
-        git push
+        BASE_BRANCH="main"  # Change this if needed
+        TIMESTAMP=$(date +%Y%m%d%H%M%S)
+        FEATURE_BRANCH="feature-update-${TIMESTAMP}"
+        git config --global user.email "github-actions@github.com"
+        git config --global user.name "GitHub Actions"
+        git fetch origin
+        git checkout -b "$FEATURE_BRANCH" origin/"$BASE_BRANCH"
+        git add workflows/
+
+        if git diff --staged --quiet; then
+          echo "No changes detected, skipping commit and PR creation."
+          exit 0
+        fi
+
+        git commit -m "Automated update for workflows - $TIMESTAMP"
+        git push origin "$FEATURE_BRANCH"
+        gh pr create --base "$BASE_BRANCH" --head "$FEATURE_BRANCH" --title "Automated Workflows Update" --body "This PR includes the latest updates to workflows."
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    
