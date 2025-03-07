@@ -22,7 +22,7 @@ jobs:
 
       - name: Remove Include map
         run: |
-          sed -i '4,6d' databricks.yml
+          sed -i '/^include:/,/^$/d' databricks.yml
           echo "Modified file:"
           cat databricks.yml
 
