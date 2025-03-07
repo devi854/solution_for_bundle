@@ -20,6 +20,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Remove Include map
+        run: |
+          sed -i '/include:/,/^ [^ ]/d' databricks.yml
+          echo "Modified file:"
+          cat databricks.yml
+
       - name: Export Databricks Host URL
         run: |
           echo "DATABRICKS_HOST_URL=${{ secrets.DATABRICKS_HOST_URL }}" >> $GITHUB_ENV
