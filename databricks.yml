@@ -9,3 +9,6 @@ targets:
     workspace:
       host: https://adb-1311379277581354.14.azuredatabricks.net
       root_path: /Code/${bundle.name}
+    sync:
+      include:
+        - .github
