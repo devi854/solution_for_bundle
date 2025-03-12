@@ -14,7 +14,9 @@ on:
           - production
 
 env:
-  DATABRICKS_HOST_DEVELOPMENT: "https://adb-development.azuredatabricks.net"
+  JFrog_URL: "https://artifacts.companyorg.com"
+  ARTIFACTORY_NAME: "generic-local"
+  DATABRICKS_HOST_DEVELOPMENT: "https://adb-1513518831488714.14.azuredatabricks.net"
   DATABRICKS_HOST_STAGING: "https://adb-staging.azuredatabricks.net"
   DATABRICKS_HOST_PRODUCTION: "https://adb-production.azuredatabricks.net"
 
@@ -22,10 +24,11 @@ jobs:
   Download_JFrog_Artifact:
     runs-on: ubuntu-latest
     steps:
-      - name: Create Mock Artifact
+      - name: Create Mock Artifact (For Testing Without JFrog)
         run: |
           mkdir -p databricks-workflows/dxworkflowsv5.8
-          echo "This is a test artifact for Databricks workflows" > databricks-workflows/dxworkflowsv5.8/mock_file.txt
+          echo "Mock Artifact for Databricks" > databricks-workflows/dxworkflowsv5.8/mock_file.txt
+          echo "✅ Artifact Created Successfully!"
 
       - name: Upload Mock Artifact
         uses: actions/upload-artifact@v3
@@ -43,14 +46,29 @@ jobs:
           name: Artifact_Dx_Workflows
           path: ./
 
-      - name: Untar the artifact
-        run: tar -xzf dx_workflows_artifact.tar.gz
-
-      - name: Set Environment Variables
+      - name: Set Environment Variables Based on Input
         run: |
           ENV_UPPER=$(echo "${{ github.event.inputs.environment_var }}" | tr '[:lower:]' '[:upper:]')
-          echo "DATABRICKS_HOST=${{ env[format('DATABRICKS_HOST_{0}', ENV_UPPER)] }}" >> $GITHUB_ENV
-          echo "DATABRICKS_TOKEN=${{ secrets[format('DATABRICKS_TOKEN_{0}', ENV_UPPER)] }}" >> $GITHUB_ENV
+          echo "🔹 Selected Deployment Environment: $ENV_UPPER"
+
+          if [[ "$ENV_UPPER" == "DEVELOPMENT" ]]; then
+            echo "DATABRICKS_HOST=${{ env.DATABRICKS_HOST_DEVELOPMENT }}" >> $GITHUB_ENV
+            echo "DATABRICKS_TOKEN=${{ secrets.DATABRICKS_TOKEN_DEVELOPMENT }}" >> $GITHUB_ENV
+            echo "✅ Deploying to DEVELOPMENT Databricks!"
+          elif [[ "$ENV_UPPER" == "STAGING" ]]; then
+            echo "DATABRICKS_HOST=${{ env.DATABRICKS_HOST_STAGING }}" >> $GITHUB_ENV
+            echo "DATABRICKS_TOKEN=${{ secrets.DATABRICKS_TOKEN_STAGING }}" >> $GITHUB_ENV
+            echo "✅ Deploying to STAGING Databricks!"
+          elif [[ "$ENV_UPPER" == "PRODUCTION" ]]; then
+            echo "DATABRICKS_HOST=${{ env.DATABRICKS_HOST_PRODUCTION }}" >> $GITHUB_ENV
+            echo "DATABRICKS_TOKEN=${{ secrets.DATABRICKS_TOKEN_PRODUCTION }}" >> $GITHUB_ENV
+            echo "🚀 Deploying to PRODUCTION Databricks!"
+          fi
+
+      - name: Display Set Environment Variables
+        run: |
+          echo "🔹 DATABRICKS_HOST: $DATABRICKS_HOST"
+          echo "🔹 Deployment Environment: $ENV_UPPER"
 
       - name: Replace Host URL in databricks.yml
         run: sed -i "s|\${DATABRICKS_HOST_${ENV_UPPER}}|${DATABRICKS_HOST}|g" databricks.yml
@@ -62,7 +80,12 @@ jobs:
           DATABRICKS_HOST: ${{ env.DATABRICKS_HOST }}
 
       - name: Validate Databricks Bundle
-        run: databricks bundle validate -t ${{ github.event.inputs.environment_var }}
+        run: |
+          echo "🔎 Validating deployment for $ENV_UPPER..."
+          databricks bundle validate -t ${{ github.event.inputs.environment_var }}
 
       - name: Deploy Databricks Bundle
-        run: databricks bundle deploy -t ${{ github.event.inputs.environment_var }}
+        run: |
+          echo "🚀 Deploying to $ENV_UPPER environment..."
+          databricks bundle deploy -t ${{ github.event.inputs.environment_var }}
+          echo "✅ Deployment to $ENV_UPPER completed successfully!"
