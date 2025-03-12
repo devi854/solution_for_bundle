@@ -4,7 +4,7 @@ bundle:
 targets:
   development:
     workspace:
-      host: ${DATABRICKS_HOST}
+      host: ${DATABRICKS_HOST_DEVELOPMENT}
       root_path: /Code/${bundle.name}
     sync:
       include:
