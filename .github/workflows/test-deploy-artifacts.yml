@@ -17,7 +17,7 @@ env:
   JFrog_URL: "https://artifacts.companyorg.com"
   ARTIFACTORY_NAME: "generic-local"
   DATABRICKS_HOST_DEVELOPMENT: "https://adb-1513518831488714.14.azuredatabricks.net"
-  DATABRICKS_HOST_STAGING: "https://adb-staging.azuredatabricks.net"
+  DATABRICKS_HOST_STAGING: "https://adb-1513518831488714.14.azuredatabricks.net"
   DATABRICKS_HOST_PRODUCTION: "https://adb-production.azuredatabricks.net"
 
 jobs:
