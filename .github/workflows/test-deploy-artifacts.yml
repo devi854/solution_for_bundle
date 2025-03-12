@@ -21,24 +21,9 @@ env:
   DATABRICKS_HOST_PRODUCTION: "https://adb-production.azuredatabricks.net"
 
 jobs:
-  Download_JFrog_Artifact:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Create Mock Artifact (For Testing Without JFrog)
-        run: |
-          mkdir -p databricks-workflows/dxworkflowsv5.8
-          echo "Mock Artifact for Databricks" > databricks-workflows/dxworkflowsv5.8/mock_file.txt
-          echo "✅ Artifact Created Successfully!"
-
-      - name: Upload Mock Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: Artifact_Dx_Workflows
-          path: ./databricks-workflows/dxworkflowsv5.8
 
   Deploy_Databricks:
     runs-on: ubuntu-latest
-    needs: Download_JFrog_Artifact
     steps:
       - name: Download Artifacts Locally
         uses: actions/download-artifact@v3
