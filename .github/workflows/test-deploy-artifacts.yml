@@ -31,31 +31,37 @@ jobs:
         run: |
           ENV_UPPER=$(echo "${{ github.event.inputs.environment_var }}" | tr '[:lower:]' '[:upper:]')
           echo "ENV_UPPER=$ENV_UPPER" >> $GITHUB_ENV
-          
+
           case "$ENV_UPPER" in
             "DEVELOPMENT")
               echo "DATABRICKS_HOST=${{ env.DATABRICKS_HOST_DEVELOPMENT }}" >> $GITHUB_ENV
               echo "DATABRICKS_TOKEN=${{ secrets.DATABRICKS_TOKEN_DEVELOPMENT }}" >> $GITHUB_ENV
+              DEPLOYMENT_MESSAGE="🌱 Deploying to DEVELOPMENT (DEV) Environment!"
               ;;
             "STAGING")
               echo "DATABRICKS_HOST=${{ env.DATABRICKS_HOST_STAGING }}" >> $GITHUB_ENV
               echo "DATABRICKS_TOKEN=${{ secrets.DATABRICKS_TOKEN_STAGING }}" >> $GITHUB_ENV
+              DEPLOYMENT_MESSAGE="🚀 Deploying to STAGING (UAT) Environment!"
               ;;
             "PRODUCTION")
               echo "DATABRICKS_HOST=${{ env.DATABRICKS_HOST_PRODUCTION }}" >> $GITHUB_ENV
               echo "DATABRICKS_TOKEN=${{ secrets.DATABRICKS_TOKEN_PRODUCTION }}" >> $GITHUB_ENV
+              DEPLOYMENT_MESSAGE="🔥 Deploying to PRODUCTION (LIVE) Environment!"
               ;;
           esac
 
-      - name: Display Set Environment Variables
+          echo "DEPLOYMENT_MESSAGE=$DEPLOYMENT_MESSAGE" >> $GITHUB_ENV
+          echo -e "\033[1;32m✅ $DEPLOYMENT_MESSAGE\033[0m"
+
+      - name: Display Deployment Information
         run: |
-          echo "🔹 Selected Deployment Environment: $ENV_UPPER"
-          echo "🔹 DATABRICKS_HOST: $DATABRICKS_HOST"
-      
+          echo -e "\033[1;34m[INFO]\033[0m Deployment Target: \033[1;36m$ENV_UPPER\033[0m"
+          echo -e "\033[1;34m[INFO]\033[0m Databricks Host: \033[1;33m$DATABRICKS_HOST\033[0m"
+
       - name: Replace Host URL in databricks.yml
         run: |
           sed -i "s|\${DATABRICKS_HOST_${ENV_UPPER}}|${DATABRICKS_HOST}|g" databricks.yml
-          echo "✅ Updated databricks.yml with correct host"
+          echo -e "\033[1;32m✅ Updated databricks.yml with Databricks Host\033[0m"
 
       - name: Configure Databricks CLI
         uses: databricks/setup-cli@main  
@@ -65,11 +71,11 @@ jobs:
 
       - name: Validate Databricks Bundle
         run: |
-          echo "🔎 Validating deployment for $ENV_UPPER..."
+          echo -e "\033[1;34m[INFO]\033[0m 🔎 Validating deployment for \033[1;36m$ENV_UPPER\033[0m..."
           databricks bundle validate -t $ENV_UPPER
 
       - name: Deploy Databricks Bundle
         run: |
-          echo "🚀 Deploying to $ENV_UPPER environment..."
+          echo -e "\033[1;34m[INFO]\033[0m 🚀 Deploying to \033[1;36m$ENV_UPPER\033[0m environment..."
           databricks bundle deploy -t $ENV_UPPER
-          echo "✅ Deployment to $ENV_UPPER completed successfully!"
+          echo -e "\033[1;32m✅ Deployment to $ENV_UPPER completed successfully!\033[0m"
