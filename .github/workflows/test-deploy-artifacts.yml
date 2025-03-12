@@ -6,12 +6,12 @@ on:
       environment_var:
         description: 'Environment'
         required: true
-        default: 'development'
+        default: 'DEVELOPMENT'
         type: choice
         options:
-          - development
-          - staging
-          - production
+          - DEVELOPMENT
+          - STAGING
+          - PRODUCTION
 
 env:
   JFrog_URL: "https://artifacts.companyorg.com"
