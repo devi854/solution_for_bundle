@@ -25,11 +25,6 @@ jobs:
   Deploy_Databricks:
     runs-on: ubuntu-latest
     steps:
-      - name: Download Artifacts Locally
-        uses: actions/download-artifact@v3
-        with:
-          name: Artifact_Dx_Workflows
-          path: ./
 
       - name: Set Environment Variables Based on Input
         run: |
