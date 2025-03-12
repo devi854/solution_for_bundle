@@ -2,7 +2,7 @@ bundle:
   name: hanuman
 
 targets:
-  dev:
+  development:
     workspace:
       host: ${DATABRICKS_HOST_DEVELOPMENT}
       root_path: /Code/${bundle.name}
