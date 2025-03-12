@@ -53,7 +53,7 @@ jobs:
           echo "🔹 Deployment Environment: $ENV_UPPER"
 
       - name: Replace Host URL in databricks.yml
-        run: sed -i "s|\${DATABRICKS_HOST_DEVELOPMENT}|${{ env.DATABRICKS_HOST }}|g" databricks.yml
+        run: sed -i "s|\${DATABRICKS_HOST_${{ github.event.inputs.environment_var }}}|${{ env.DATABRICKS_HOST }}|g" databricks.yml
 
       - name: Configure Databricks CLI
         uses: databricks/setup-cli@main  
