@@ -12,7 +12,7 @@ targets:
 
   STAGING:
     workspace:
-      host: ${DATABRICKS_HOST_DEVELOPMENT}
+      host: ${DATABRICKS_HOST_STAGING}
       root_path: /Code/${bundle.name}
     sync:
       include:
