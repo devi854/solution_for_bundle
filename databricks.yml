@@ -2,7 +2,15 @@ bundle:
   name: hanuman
 
 targets:
-  development:
+  DEVELOPMENT:
+    workspace:
+      host: ${DATABRICKS_HOST_DEVELOPMENT}
+      root_path: /Code/${bundle.name}
+    sync:
+      include:
+        - notebooks
+
+  STAGING:
     workspace:
       host: ${DATABRICKS_HOST_DEVELOPMENT}
       root_path: /Code/${bundle.name}
