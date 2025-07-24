@@ -6,7 +6,7 @@ on:
       - main
   push:
     branches:
-      - main
+      - mai
 
 env:
   DATABRICKS_HOST: ${{secrets.DATABRICKS_HOST}}

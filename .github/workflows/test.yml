@@ -1,0 +1,27 @@
+name: YAML workflows
+
+on:
+  workflow_dispatch:
+
+env:
+  DATABRICKS_HOST: ${{secrets.DATABRICKS_HOST}}
+  DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_DEV_TOKEN }}
+
+jobs:
+  update-workflows:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+  
+    - name: Databricks CLI
+      uses: databricks/setup-cli@main
+
+    - name: Validate Databricks Bundle
+      run: |
+        databricks bundle validate -t dev
+
+    - name: Deploy Bundle
+      run: |
+        databricks bundle deploy -t dev
