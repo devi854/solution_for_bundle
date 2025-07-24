@@ -55,6 +55,21 @@ jobs:
       - name: checkout Code
         uses: actions/checkout@v4
 
+      - name: Azure Login with Federated Identity
+        uses: azure/login@v2
+        with:
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.TENANT_ID }}
+          subscription-id: ${{ env.SUBSCRIPTIONID_DEV }}
+
+      - name: Get AAD token for Azure Databricks
+        id: get-token
+        run: |
+          TOKEN=$(az account get-access-token --resource https://databricks.azure.net --query accessToken -o tsv)
+          echo "::add-mask::$TOKEN"
+          echo "DATABRICKS_TOKEN=$TOKEN" >> $GITHUB_ENV
+  
+
       - name: Databricks CLI
         uses: databricks/setup-cli@main
   
@@ -74,7 +89,7 @@ jobs:
         with:
           workspace-notebook-path: /Workspace/Code/hanuman/files/notebooks/test
           databricks-host: ${{ env.DATABRICKS_HOST }}
-          databricks-token: ${{ env.AZURE_CLIENT_ID }}
+          databricks-token: ${{ env.DATABRICKS_TOKEN }}
           new-cluster-json: |
             {
               "autoscale": {
