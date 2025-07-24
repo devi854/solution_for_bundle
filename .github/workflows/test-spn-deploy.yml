@@ -1,0 +1,51 @@
+name: test sp deploy
+
+on:
+  workflow_dispatch:
+
+env:
+  DATABRICKS_HOST: https://adb-4497997910370043.3.azuredatabricks.net
+  DATABRICKS_CONFIG_PROFILE: spn-profile
+  CLIENT_ID: 52500de1-d35b-4bae-8593-f31b500ca1a9
+  CLIENT_SECRET: ${{ secrets.CLIENT_SECERT }}
+  SUBSCRIPTION_ID: 730114f3-3c96-423d-b203-108734964640
+  TENANT_ID: ede58b21-37a8-4b40-b1ed-3b62f51309af
+
+
+
+
+jobs:
+  spdeploy-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Azure Login using Service Principal
+      uses: azure/login@v2
+      with:
+        creds: '{"clientId":"${{ env.CLIENT_ID }}"},"clientSecret":"${{ env.CLIENT_SECRET }}","subscriptionId":"${{ env.SUBSCRIPTION_ID }}","tenantId":"${{ env.TENANT_ID }}"}'
+         
+  
+    - name: Databricks CLI
+      uses: databricks/setup-cli@main
+
+    - name: Create .databrickscfg using Service Principal
+      run: |
+        mkdir -p ~/.databricks
+        cat <<EOF > ~/.databrickscfg
+        [${{ env.DATABRICKS_CONFIG_PROFILE }}]
+        host = ${{ env.DATABRICKS_HOST }}
+        client_id = ${{ env.CLIENT_ID }}
+        client_secret = ${{ env.CLIENT_SECRET }}
+        EOF
+      shell: bash
+
+    - name: Validate Databricks Bundle
+      run: |
+        databricks bundle validate -t dev
+
+    - name: Deploy Bundle
+      run: |
+        databricks bundle deploy -t dev
