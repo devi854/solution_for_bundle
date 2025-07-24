@@ -1,14 +1,12 @@
 bundle:
   name: hanuman
 
-include:
-  - workflows/*.yml
-
 targets:
-  dev:
+  DEVELOPMENT:
     workspace:
       host: https://adb-4497997910370043.3.azuredatabricks.net
       root_path: /Code/${bundle.name}
     sync:
       paths:
         - notebooks
+
