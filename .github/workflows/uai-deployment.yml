@@ -51,7 +51,7 @@ jobs:
       - name: Get AAD token for Azure Databricks
         id: get-token
         run: |
-          TOKEN=$(az account get-access-token --resource https://databricks.azure.net --query accessToken -o tsv)
+          TOKEN=$(az account get-access-token --resource 2ff814a6-3304-4ab8-85cb-cd0e6f879c1d --query accessToken -o tsv)
           echo "::add-mask::$TOKEN"
           echo "DATABRICKS_TOKEN=$TOKEN" >> $GITHUB_ENV
 
