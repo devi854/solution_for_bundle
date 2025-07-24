@@ -1,4 +1,4 @@
-name: YAML workflows
+name: test spn
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ env:
   DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_DEV_TOKEN }}
 
 jobs:
-  update-workflows:
+  test-spn:
     runs-on: ubuntu-latest
 
     steps:
