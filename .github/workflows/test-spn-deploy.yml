@@ -22,10 +22,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Azure Login using Service Principal
-      uses: azure/login@v2
-      with:
-        creds: '{"clientId":"${{ env.CLIENT_ID }}","clientSecret":"${{ env.CLIENT_SECRET }}","subscriptionId":"${{ env.SUBSCRIPTION_ID }}","tenantId":"${{ env.TENANT_ID }}"}'
+   # - name: Azure Login using Service Principal
+   #   uses: azure/login@v2
+   #   with:
+   #     creds: '{"clientId":"${{ env.CLIENT_ID }}","clientSecret":"${{ env.CLIENT_SECRET }}","subscriptionId":"${{ env.SUBSCRIPTION_ID }}","tenantId":"${{ env.TENANT_ID }}"}'
          
   
     - name: Databricks CLI
