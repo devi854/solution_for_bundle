@@ -5,6 +5,7 @@ on:
 
 env:
   DATABRICKS_HOST: https://adb-4497997910370043.3.azuredatabricks.net
+  DATABRICKS_TOKEN: ${{ secrets.CLIENT_SECERT }}
   DATABRICKS_CONFIG_PROFILE: spn-profile
   CLIENT_ID: 52500de1-d35b-4bae-8593-f31b500ca1a9
   CLIENT_SECRET: ${{ secrets.CLIENT_SECERT }}
@@ -31,16 +32,16 @@ jobs:
     - name: Databricks CLI
       uses: databricks/setup-cli@main
 
-    - name: Create .databrickscfg using Service Principal
-      run: |
-        mkdir -p ~/.databricks
-        cat <<EOF > ~/.databrickscfg
-        [${{ env.DATABRICKS_CONFIG_PROFILE }}]
-        host = ${{ env.DATABRICKS_HOST }}
-        client_id = ${{ env.CLIENT_ID }}
-        client_secret = ${{ env.CLIENT_SECRET }}
-        EOF
-      shell: bash
+   # - name: Create .databrickscfg using Service Principal
+   #   run: |
+   #     mkdir -p ~/.databricks
+   #     cat <<EOF > ~/.databrickscfg
+   #     [${{ env.DATABRICKS_CONFIG_PROFILE }}]
+   #     host = ${{ env.DATABRICKS_HOST }}
+   #     client_id = ${{ env.CLIENT_ID }}
+   #     client_secret = ${{ env.CLIENT_SECRET }}
+   #     EOF
+   #   shell: bash
 
     - name: Validate Databricks Bundle
       run: |
