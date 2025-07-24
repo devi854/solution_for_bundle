@@ -32,16 +32,12 @@ jobs:
     - name: Databricks CLI
       uses: databricks/setup-cli@main
 
-   # - name: Create .databrickscfg using Service Principal
-   #   run: |
-   #     mkdir -p ~/.databricks
-   #     cat <<EOF > ~/.databrickscfg
-   #     [${{ env.DATABRICKS_CONFIG_PROFILE }}]
-   #     host = ${{ env.DATABRICKS_HOST }}
-   #     client_id = ${{ env.CLIENT_ID }}
-   #     client_secret = ${{ env.CLIENT_SECRET }}
-   #     EOF
-   #   shell: bash
+    - name: Create .databrickscfg using Service Principal
+      run: |
+        mkdir -p ~/.databricks
+        echo "[spn-profile]" > ~/.databrickscfg
+        echo "host = $DATABRICKS_HOST" >> ~/.databrickscfg
+        echo "token = $DATABRICKS_TOKEN" >> ~/.databrickscfg
 
     - name: Validate Databricks Bundle
       run: |
@@ -57,6 +53,16 @@ jobs:
     steps:
       - name: checkout Code
         uses: actions/checkout@v4
+
+      - name: Databricks CLI
+        uses: databricks/setup-cli@main
+  
+      - name: Create .databrickscfg using Service Principal
+        run: |
+          mkdir -p ~/.databricks
+          echo "[spn-profile]" > ~/.databrickscfg
+          echo "host = $DATABRICKS_HOST" >> ~/.databrickscfg
+          echo "token = $DATABRICKS_TOKEN" >> ~/.databrickscfg
 
       - name: Run Databricks notebook
         uses: databricks/run-notebook@v0
