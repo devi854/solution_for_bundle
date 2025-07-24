@@ -74,7 +74,7 @@ jobs:
         with:
           workspace-notebook-path: /Workspace/Code/hanuman/files/notebooks/test
           databricks-host: ${{ env.DATABRICKS_HOST }}
-          databricks-token: ${{ env.AZURE_CLIENT_ID }}
+          databricks-token: ${{ secrets.UAMI_TOKEN }}
           new-cluster-json: |
             {
               "autoscale": {
